@@ -1,0 +1,39 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
+
+class GoogleSignInProvider extends ChangeNotifier {
+  final googleSignIn = GoogleSignIn();
+  bool isSigningIn;
+
+  GoogleSignInProvider() {
+    isSigningIn = false;
+  }
+
+  Future login() async {
+    isSigningIn = true;
+
+    final user = await googleSignIn.signIn();
+    if (user == null) {
+      isSigningIn = false;
+      return;
+    } else {
+      final googleAuth = await user.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      isSigningIn = false;
+    }
+  }
+
+  void logout() async {
+    await googleSignIn.disconnect();
+    FirebaseAuth.instance.signOut();
+  }
+}
