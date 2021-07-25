@@ -23,6 +23,7 @@ class MainScreen extends StatefulWidget {
   final user = FirebaseAuth.instance.currentUser;
   static final String id = "main_screen";
   List<Book> books;
+  List<Book> allBooks;
   bool showDrawer = false;
 
   Widget addedIcon = Icon(
@@ -52,7 +53,8 @@ class _MainScreenState extends State<MainScreen> {
 
     await firestoreService.getBooks(widget.user.uid);
 
-    widget.books = firestoreService.getBooksList(widget.user.uid);
+    widget.books = firestoreService.getBooksList();
+    widget.allBooks = firestoreService.getAllBooksList();
 
     setState(() {
       isLoading = false;
@@ -123,8 +125,10 @@ class _MainScreenState extends State<MainScreen> {
                       final provider = Provider.of<GoogleSignInProvider>(
                           context,
                           listen: false);
+                      setState(() {
+                        isLoading = true;
+                      });
                       provider.logout();
-                      isLoading = true;
                     },
                     child: Text(
                       "LOGOUT",
@@ -337,13 +341,13 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                     Expanded(
                       child: ListView.builder(
-                          itemCount: widget.books.length,
+                          itemCount: widget.allBooks.length,
                           itemBuilder: (BuildContext context, int index) {
                             return GestureDetector(
                               onTap: () {
                                 Navigator.push(context,
                                     MaterialPageRoute(builder: (context) {
-                                  return BookScreen(widget.books[index]);
+                                  return BookScreen(widget.allBooks[index]);
                                 }));
                               },
                               child: Container(
@@ -357,8 +361,8 @@ class _MainScreenState extends State<MainScreen> {
                                           borderRadius:
                                               BorderRadius.circular(5),
                                           image: DecorationImage(
-                                              image: NetworkImage(
-                                                  widget.books[index].imageUrl),
+                                              image: NetworkImage(widget
+                                                  .allBooks[index].imageUrl),
                                               fit: BoxFit.fill)),
                                     ),
                                     SizedBox(
@@ -370,12 +374,13 @@ class _MainScreenState extends State<MainScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            (widget.books[index].name.length >
+                                            (widget.allBooks[index].name
+                                                        .length >
                                                     40)
-                                                ? widget.books[index].name
+                                                ? widget.allBooks[index].name
                                                         .substring(0, 39) +
                                                     '...'
-                                                : widget.books[index].name,
+                                                : widget.allBooks[index].name,
                                             style: TextStyle(
                                                 fontSize: 20,
                                                 color: Colors.white),
@@ -384,13 +389,15 @@ class _MainScreenState extends State<MainScreen> {
                                             padding: const EdgeInsets.only(
                                                 top: 4.0, bottom: 10),
                                             child: Text(
-                                              (widget.books[index].author
+                                              (widget.allBooks[index].author
                                                           .length >
                                                       40)
-                                                  ? widget.books[index].author
+                                                  ? widget.allBooks[index]
+                                                          .author
                                                           .substring(0, 39) +
                                                       '...'
-                                                  : widget.books[index].author,
+                                                  : widget
+                                                      .allBooks[index].author,
                                               style: TextStyle(
                                                   fontSize: 15,
                                                   color: Colors.white),
@@ -398,7 +405,8 @@ class _MainScreenState extends State<MainScreen> {
                                           ),
                                           Expanded(
                                             child: Text(
-                                              widget.books[index].description,
+                                              widget
+                                                  .allBooks[index].description,
                                               style: TextStyle(
                                                   fontSize: 12,
                                                   color: Colors.white),
@@ -415,7 +423,7 @@ class _MainScreenState extends State<MainScreen> {
                                       children: [
                                         IconTextRow(
                                           icon: Icons.menu_book_outlined,
-                                          text: widget.books[index].pageCount
+                                          text: widget.allBooks[index].pageCount
                                               .toString(),
                                         ),
                                         Container(
@@ -429,9 +437,9 @@ class _MainScreenState extends State<MainScreen> {
                                             color: Colors.white,
                                             onPressed: () {
                                               setState(() {
-                                                widget.books[index].isAdded =
-                                                    !widget
-                                                        .books[index].isAdded;
+                                                widget.allBooks[index].isAdded =
+                                                    !widget.allBooks[index]
+                                                        .isAdded;
                                               });
                                             },
                                           ),
