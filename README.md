@@ -1,3 +1,11 @@
-# book_exchange
+# Book Exchanger
 
-A new Flutter project which allows users to exchange their books. This app uses firebase and google books api.
+This is a flutter app where users can manage their personal library and exchange books with other users.
+
+### Technologies used :-
+
+- Firebase
+ - Google Sign-in
+ - Cloud Firestore
+- Google Books API
+- Provider State Management 
